@@ -90,9 +90,9 @@ jobs:
         id: image
         shell: bash
         run: |
+          repo="${GITHUB_REPOSITORY#*/}"
           echo "owner_lc=${GITHUB_ACTOR,,}" >> "$GITHUB_OUTPUT"
-          echo "repo_lc=${GITHUB_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
-          echo "repo_lc=${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]' | awk '{print "repo_lc="$0}' >> "$GITHUB_OUTPUT"
+          echo "repo_lc=${repo,,}" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:
           context: .
