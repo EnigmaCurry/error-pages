@@ -86,6 +86,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lowercase image namespace
+        id: image
+        shell: bash
+        run: |
+          echo "owner_lc=${GITHUB_ACTOR,,}" >> "$GITHUB_OUTPUT"
+          echo "repo_lc=${GITHUB_REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
+          echo "repo_lc=${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]' | awk '{print "repo_lc="$0}' >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:
           context: .
@@ -94,7 +101,7 @@ jobs:
           platforms: linux/amd64,linux/arm/v7,linux/arm64/v8
           build-args: "APP_VERSION=${{ steps.slug.outputs.version }}"
           tags: |
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{ steps.slug.outputs.version }}
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{ steps.slug.outputs.version-major }}.${{ steps.slug.outputs.version-minor }}
-            ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{ steps.slug.outputs.version-major }}
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/${{ steps.image.outputs.repo_lc }}:latest
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/${{ steps.image.outputs.repo_lc }}:${{ steps.slug.outputs.version }}
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/${{ steps.image.outputs.repo_lc }}:${{ steps.slug.outputs.version-major }}.${{ steps.slug.outputs.version-minor }}
+            ghcr.io/${{ steps.image.outputs.owner_lc }}/${{ steps.image.outputs.repo_lc }}:${{ steps.slug.outputs.version-major }}
